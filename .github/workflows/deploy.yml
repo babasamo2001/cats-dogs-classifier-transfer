@@ -1,0 +1,27 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ main ] # Only runs when you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to your project folder on EC2
+            cd /home/ec2-user/cats-dogs-classifier-transfer
+            
+            # Pull the latest changes
+            git pull origin main
+            
+            # Rebuild and restart the container
+            # This triggers the 'lifespan' startup logic we defined earlier
+            docker-compose down
+            docker-compose up -d --build
