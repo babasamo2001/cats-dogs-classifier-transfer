@@ -12,7 +12,7 @@ from src.utils import setup_logger
 
 # --- S3 CONFIGURATION ---
 S3_BUCKET_NAME = "cats-dogs-model-785534816302-eu-west-1-an"
-S3_MODEL_KEY = "models/best_model.keras"
+S3_MODEL_KEY = "best_model.keras"
 LOCAL_MODEL_PATH = "/tmp/best_model.keras"
 
 request_count = 0
