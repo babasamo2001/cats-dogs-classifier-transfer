@@ -1,5 +1,6 @@
 import io
 import time
+import zipfile
 import tensorflow as tf
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import HTMLResponse
@@ -12,8 +13,9 @@ from src.utils import setup_logger
 
 # --- S3 CONFIGURATION ---
 S3_BUCKET_NAME = "cats-dogs-model-785534816302-eu-west-1-an"
-S3_MODEL_KEY = "best_model.keras"
-LOCAL_MODEL_PATH = "/tmp/best_model.keras"
+S3_MODEL_KEY = "best_best_savedmodel.zip"
+LOCAL_ZIP_PATH = "/tmp/best_best_savedmodel.zip"
+EXTRACT_DIR = "/tmp/best_best_savedmodel"
 
 request_count = 0
 total_inference_time = 0.0
@@ -26,20 +28,17 @@ infer_logger = setup_logger("inference", "logs/inference.log")
 # --- APP INIT & MODEL LOADING ---
 app = FastAPI()
 
-# Call the imported function and pass the app's logger to it
-download_model_from_s3(S3_BUCKET_NAME, S3_MODEL_KEY, LOCAL_MODEL_PATH, logger)
+# 1. Pull down the compressed SavedModel bundle from S3
+download_model_from_s3(S3_BUCKET_NAME, S3_MODEL_KEY, LOCAL_ZIP_PATH, logger)
 
-logger.info(f"Loading TensorFlow model from transient path: {LOCAL_MODEL_PATH}")
+# 2. Extract zip archive contents to /tmp
+logger.info(f"Extracting zipped model directory to: {EXTRACT_DIR}")
+with zipfile.ZipFile(LOCAL_ZIP_PATH, 'r') as zip_ref:
+    zip_ref.extractall(EXTRACT_DIR)
 
-# Robust loading logic to handle Keras 2 / Keras 3 version discrepancies
-try:
-    logger.info("Attempting standard model load...")
-    model = tf.keras.models.load_model(LOCAL_MODEL_PATH)
-except Exception as e:
-    logger.warning(f"Standard load failed: {e}. Trying fallback legacy Keras loading...")
-    import keras
-    model = keras.saving.load_model(LOCAL_MODEL_PATH, safe_mode=False)
-
+# 3. Load the model from the unzipped directory track
+logger.info(f"Loading TensorFlow model graph from directory: {EXTRACT_DIR}")
+model = tf.keras.models.load_model(EXTRACT_DIR)
 logger.info("TensorFlow model loaded successfully into RAM.")
 
 # STATIC FILES
@@ -61,7 +60,7 @@ def health():
             "status": "ok",
             "service": "image-classifier-transfer",
             "model_loaded": model is not None,
-            "transient_path": LOCAL_MODEL_PATH,
+            "transient_path": EXTRACT_DIR,
             "s3_source": f"s3://{S3_BUCKET_NAME}/{S3_MODEL_KEY}",
             "timestamp": time.time()
         }
@@ -91,7 +90,7 @@ async def predict(file: UploadFile = File(...)):
 def model_info():
     total_params = int(sum([tf.size(v).numpy() for v in model.trainable_weights]))
     return {
-        "model_path": LOCAL_MODEL_PATH,
+        "model_path": EXTRACT_DIR,
         "input_shape": str(model.input_shape),
         "output_shape": str(model.output_shape),
         "total_params": total_params
@@ -103,4 +102,4 @@ def model_info():
 def request_count_endpoint():
     global request_count
     request_count += 1
-    return {"total_requests_to_this_endpoint": request_count}       
+    return {"total_requests_to_this_endpoint": request_count}
