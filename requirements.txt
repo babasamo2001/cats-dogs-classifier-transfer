@@ -1,9 +1,10 @@
 fastapi
-Fastapi
+fastapi
 matplotlib
 numpy
 opencv-python
 pillow
 boto3
-tensorflow
+tensorflow==2.15.0
+keras==2.15.0
 uvicorn
