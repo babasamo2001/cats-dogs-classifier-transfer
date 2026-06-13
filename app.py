@@ -30,7 +30,16 @@ app = FastAPI()
 download_model_from_s3(S3_BUCKET_NAME, S3_MODEL_KEY, LOCAL_MODEL_PATH, logger)
 
 logger.info(f"Loading TensorFlow model from transient path: {LOCAL_MODEL_PATH}")
-model = tf.keras.models.load_model(LOCAL_MODEL_PATH)
+
+# Robust loading logic to handle Keras 2 / Keras 3 version discrepancies
+try:
+    logger.info("Attempting standard model load...")
+    model = tf.keras.models.load_model(LOCAL_MODEL_PATH)
+except Exception as e:
+    logger.warning(f"Standard load failed: {e}. Trying fallback legacy Keras loading...")
+    import keras
+    model = keras.saving.load_model(LOCAL_MODEL_PATH, safe_mode=False)
+
 logger.info("TensorFlow model loaded successfully into RAM.")
 
 # STATIC FILES
@@ -94,4 +103,4 @@ def model_info():
 def request_count_endpoint():
     global request_count
     request_count += 1
-    return {"total_requests_to_this_endpoint": request_count}
+    return {"total_requests_to_this_endpoint": request_count}       
