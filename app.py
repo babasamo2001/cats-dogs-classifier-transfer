@@ -74,11 +74,11 @@ async def lifespan(app: FastAPI):
     logger.info("Optimizing TensorFlow environment variables for low-RAM environment...")
     tf.keras.backend.clear_session()
 
-    logger.info(f"Loading native SavedModel directory structural mapping from: {LOCAL_MODEL_DIR}")
+    logger.info(f"Loading SavedModel directory using TFSMLayer from: {LOCAL_MODEL_DIR}")
 
-    # 3. Load model directly using directory target mapping
-    model = tf.keras.models.load_model(LOCAL_MODEL_DIR, compile=False)
-    logger.info("TensorFlow SavedModel successfully assigned to RAM.")
+    # 3. Use TFSMLayer to parse the compiled model directory for Keras 3 compatibility
+    model = tf.keras.layers.TFSMLayer(LOCAL_MODEL_DIR, call_endpoint='serving_default')
+    logger.info("TensorFlow SavedModel successfully assigned to RAM via TFSMLayer.")
 
     yield
     logger.info("Cleaning up resource configurations during shutdown...")
