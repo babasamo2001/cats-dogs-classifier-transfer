@@ -1,0 +1,42 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs (do NOT copy into image)
+logs/
+
+# Model artifacts (optional - depends on deployment strategy)
+# If you load from S3 at runtime, exclude models/
+models/
+
+# Data (very important - NEVER bake datasets into Docker image)
+data/
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local IDE configs
+.vscode/
+.idea/
+
+# Training artifacts not needed in container build
+notebooks/
+assets/
+
+# Cache folders
+*.cache

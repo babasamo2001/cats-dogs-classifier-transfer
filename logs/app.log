@@ -1,0 +1,4 @@
+2026-06-19 08:24:31,326 - INFO - Connecting to S3 to download s3://cats-dogs-model-785534816302-eu-west-1-an/best_model.keras
+2026-06-19 08:24:33,746 - ERROR - S3 Download failed: Unable to locate credentials
+2026-06-19 10:10:38,307 - INFO - Connecting to S3 to download s3://cats-dogs-model-785534816302-eu-west-1-an/best_model.keras
+2026-06-19 10:10:40,819 - ERROR - S3 Download failed: Unable to locate credentials
