@@ -1,0 +1,43 @@
+name: Deploy to EC2 Production
+
+on:
+  push:
+    branches:
+      - main # Triggers the workflow on pushes to your main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: SSH into EC2 and Deploy App
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # 1. Navigate to your project folder
+          cd ~/cats-dogs-classifier-transfer
+
+          # 2. Pull the latest commits from your updated repo
+          git fetch origin
+          git reset --hard origin/main
+
+          # 3. Stop and remove the old running container instance
+          docker rm -f my-running-app || true
+
+          # 4. Build the fresh container image with your changes
+          docker build -t classifier-app .
+
+          # 5. Spin up the container with your low-RAM optimizations
+          docker run -d \
+            -p 8000:8000 \
+            --name my-running-app \
+            -e TF_NUM_INTRAOP_THREADS=1 \
+            -e TF_NUM_INTEROP_THREADS=1 \
+            -e PYTHONMALLOC=malloc \
+            classifier-app
