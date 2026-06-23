@@ -27,14 +27,14 @@ jobs:
           git fetch origin
           git reset --hard origin/main
 
-          # 3. Stop and remove the old running container instance
-          docker rm -f my-running-app || true
+          # 3. Stop and remove the old running container instance (with sudo)
+          sudo docker rm -f my-running-app || true
 
-          # 4. Build the fresh container image with your changes
-          docker build -t classifier-app .
+          # 4. Build the fresh container image with your changes (with sudo)
+          sudo docker build -t classifier-app .
 
-          # 5. Spin up the container with your low-RAM optimizations
-          docker run -d \
+          # 5. Spin up the container with your low-RAM optimizations (with sudo)
+          sudo docker run -d \
             -p 8000:8000 \
             --name my-running-app \
             -e TF_NUM_INTRAOP_THREADS=1 \
