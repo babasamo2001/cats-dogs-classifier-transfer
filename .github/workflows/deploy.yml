@@ -27,7 +27,8 @@ jobs:
           git fetch origin
           git reset --hard origin/main
 
-          # 3. Stop and remove the old running container instance (with sudo)
+          # 3. Stop gracefully, then remove the old container instance safely
+          sudo docker stop my-running-app || true
           sudo docker rm -f my-running-app || true
 
           # 4. Build the fresh container image with your changes (with sudo)
