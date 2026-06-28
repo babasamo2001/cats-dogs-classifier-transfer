@@ -2,7 +2,7 @@
 
 A production-ready Deep Learning web application that classifies images into three distinct categories (Cats, Dogs, or Other Objects) by leveraging Transfer Learning via a pretrained MobileNetV3-Small architecture.
 
-Live Demo: `http://cat-dog-others.com`
+Live Demo: `https://demo-apps.ddnsfree.com/`
 
 The trained model is exposed through an expanded FastAPI backend containerized with Docker, routed via an Nginx reverse proxy server, and hosted on an AWS EC2 instance, allowing users to upload images through a web interface and receive real-time predictions.
 
@@ -216,6 +216,12 @@ In addition to the standard image prediction endpoint inherited from our custom 
 - GET /model-info: Exposes core active model metadata, structural layout properties, and current 2-stage transfer learning tracking parameters.
 - GET /request-count: Native analytics endpoint monitoring total active user prediction traffic hitting the application instance since container initialization.
 
+# Automated CI/CD Deployment Pipeline (GitHub Actions + Docker)
+
+The application features a fully automated Continuous Integration and Continuous Deployment (CI/CD) pipeline powered by **GitHub Actions**. Every code change 
+pushed to the `main` branch automatically triggers a remote update sequence on the AWS EC2 production server, removing manual overhead entirely and ensuring 
+zero-downtime deployment capabilities.
+
 # Production Tech Stack Routing
 
 User Request (HTTP/HTTPS) ──> Nginx Reverse Proxy (Port 80/443) ──> Docker Container ──> FastAPI (Non-exposed port 8000)
@@ -245,18 +251,18 @@ Frontend Interface
 
 ![ui](assets/ui.png)
 
-# Installation & Usage
+# Installation & Usage (Production Context)
 
-Local Development (Dockerized)
-- Configure your AWS credentials to enable S3 access:
-Ensure your local environment has the permissions required to pull the model weights from your S3 bucket:
+Production Deployment (AWS EC2 + Docker)
+- Configure AWS S3 Access via EC2 IAM Instance Profile: No manual access keys or configuration files are required on the server. Secure access is managed automatically by attaching an AWS IAM Role possessing the necessary S3 read permissions (e.g., AmazonS3ReadOnlyAccess) directly to your EC2 instance profile
+- The application backend uses boto3, which will automatically detect and authenticate through this attached instance role at runtime to securely pull the model weights from your S3 bucket
 
-Set up your free DuckDNS Domain:
-- Go to duckdns.org and log in.
-- Create a free domain token (e.g., your-app-subdomain.duckdns.org).
-- Point the subdomain to your local development machine's current IP address (or 127.0.0.1 for local loopback test cycles).
+Set up your free Domain: 
+- Go to your dynamic DNS provider page
+- Point the domain demo-apps.ddnsfree.com to your current EC2 instance public IP address
 
-Build the production Docker container application image:
+Build the production Docker container application image: 
+- docker build -t classifier-app .
 
 Run the container environment locally mapping the FastAPI internal port:
 Pass your custom domain configuration as an environment variable so your app context knows its public facing URL:
@@ -329,7 +335,6 @@ dogs_cats_classifier_transfer/
 # Future Improvements
 
 - Transitioning from a single EC2 configuration to an automated AWS ECS (Elastic Container Service) cluster configuration with an Application Load Balancer.
-- Introducing automated CI/CD workflows via GitHub Actions to rebuild and deploy Docker images to EC2 upon new main branch commits.
 - Hooking up Prometheus and Grafana dashboards directly to the /request-count and /health endpoints for continuous infrastructure health monitoring.
 
 
