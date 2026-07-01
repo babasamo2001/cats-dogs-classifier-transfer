@@ -16,7 +16,7 @@ Building upon my previous Custom Baseline CNN project (which was limited to a bi
 - In-Model Normalization: Handled natively by embedded tensor rescaling layers within the MobileNetV3 backbone.
 - 2-Stage Training Strategy: Initial high-level Feature Extraction followed by deep structural Fine-Tuning.
 - Out-of-Distribution Robustness: Ability to detect background elements, humans, or alternative targets as "Other".
-- Enterprise Production Cloud Stack: Multi-container deployment on an AWS EC2 instance behind an Nginx reverse proxy using Amazon S3 for weight persistence.
+- Enterprise Production Cloud Stack: Container deployment on an AWS EC2 instance behind an Nginx reverse proxy using Amazon S3 for weight persistence.
 - Application Telemetry & Monitoring: Dedicated backend endpoints for health checks, model properties, and request counting traffic metrics.
 
 # Dataset
