@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     background: #f5f5f5;
-    height: 100vh;
+    min-height: 100vh; /* Changed height to min-height to allow scrolling on small landscape screens if needed */
     margin: 0;
 
     display: flex;
@@ -11,7 +11,9 @@ body {
 
 .container {
     background: white;
-    width: 420px;
+    width: 90%; /* Forces the container to adjust dynamically on narrow screens */
+    max-width: 420px; /* Caps the size so it doesn't get awkwardly wide on desktop */
+    box-sizing: border-box; /* Ensures padding is included in the width calculation */
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 0 12px rgba(0,0,0,0.12);
@@ -19,7 +21,7 @@ body {
 }
 
 #originalImg {
-    max-width: 240px;
+    max-width: 100%; /* Keeps the image scaling safely inside the container parent */
     max-height: 240px;
     margin-top: 15px;
     border-radius: 10px;
@@ -52,3 +54,7 @@ button:hover {
     transform: scale(1.03);
 }
 
+/* Optional: Handles file input file-chooser overflow on narrow screens */
+#fileInput {
+    max-width: 100%;
+}
