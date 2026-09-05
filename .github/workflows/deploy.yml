@@ -3,7 +3,9 @@ name: Deploy to EC2 Production
 on:
   push:
     branches:
-      - main # Triggers the workflow on pushes to your main branch
+      - main
+  repository_dispatch:
+    types: [ec2_restarted]
 
 jobs:
   deploy:
@@ -16,7 +18,7 @@ jobs:
     - name: SSH into EC2 and Deploy App
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ github.event.client_payload.new_ip || secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
